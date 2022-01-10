@@ -26,14 +26,14 @@ contract IlliquidDAOStaking is ERC20("veIlliquidDAO", "veIlliquidDAO"), Ownable 
     Config public config;
 
     /*
-     * Construct an OpenDAOStaking contract.
+     * Construct an IlliquidDAOStaking contract.
      *
      * @param _illiquidDAOAmount the contract address of IlliquidDAOAmount token
      * @param _periodStart the initial start time of rewards period
      * @param _rewardsDuration the duration of rewards in seconds
      */
     constructor(IERC20 _illiquidDAO, uint64 _periodStart, uint64 _rewardsDuration) {
-        require(address(_illiquidDAO) != address(0), "OpenDAOStaking: _illiquidDAOAmount cannot be the zero address");
+        require(address(_illiquidDAO) != address(0), "IlliquidDAOStaking: _illiquidDAOAmount cannot be the zero address");
         illiquidDAO = _illiquidDAO;
         setPeriod(_periodStart, _rewardsDuration);
     }
@@ -45,7 +45,7 @@ contract IlliquidDAOStaking is ERC20("veIlliquidDAO", "veIlliquidDAO"), Ownable 
      */
     function addRewardIlliquidDAO(uint256 _illiquidDAOAmount) external {
         Config memory cfg = config;
-        require(block.timestamp < cfg.periodFinish, "OpenDAOStaking: Adding rewards is forbidden");
+        require(block.timestamp < cfg.periodFinish, "IlliquidDAOStaking: Adding rewards is forbidden");
 
         illiquidDAO.safeTransferFrom(msg.sender, address(this), _illiquidDAOAmount);
         cfg.totalReward += _illiquidDAOAmount.toUint128();
@@ -60,11 +60,11 @@ contract IlliquidDAOStaking is ERC20("veIlliquidDAO", "veIlliquidDAO"), Ownable 
      * @param _rewardsDuration the duration of rewards in seconds
      */
     function setPeriod(uint64 _periodStart, uint64 _rewardsDuration) public onlyOwner {
-        require(_periodStart >= block.timestamp, "OpenDAOStaking: _periodStart shouldn't be in the past");
-        require(_rewardsDuration > 0, "OpenDAOStaking: Invalid rewards duration");
+        require(_periodStart >= block.timestamp, "IlliquidDAOStaking: _periodStart shouldn't be in the past");
+        require(_rewardsDuration > 0, "IlliquidDAOtaking: Invalid rewards duration");
 
         Config memory cfg = config;
-        require(cfg.periodFinish < block.timestamp, "OpenDAOStaking: The last reward period should be finished before setting a new one");
+        require(cfg.periodFinish < block.timestamp, "IlliquidDAOStaking: The last reward period should be finished before setting a new one");
 
         uint64 _periodFinish = _periodStart + _rewardsDuration;
         config.periodStart = _periodStart;
@@ -111,7 +111,7 @@ contract IlliquidDAOStaking is ERC20("veIlliquidDAO", "veIlliquidDAO"), Ownable 
      * @param _illiquidDAOAmountAmount
      */
     function enter(uint256 _illiquidDAOAmount) external {
-        require(_illiquidDAOAmount > 0, "OpenDAOStaking: Should at least stake something");
+        require(_illiquidDAOAmount > 0, "IlliquidDAOStaking: Should at least stake something");
 
         uint256 totalIlliquidDAO = getIlliquidDAOPool();
         uint256 totalShares = totalSupply();
@@ -133,7 +133,7 @@ contract IlliquidDAOStaking is ERC20("veIlliquidDAO", "veIlliquidDAO"), Ownable 
      * @param _share
      */
     function leave(uint256 _share) external {
-        require(_share > 0, "OpenDAOStaking: Should at least unstake something");
+        require(_share > 0, "IlliquidDAOStaking: Should at least unstake something");
 
         uint256 totalIlliquidDAO = getIlliquidDAOPool();
         uint256 totalShares = totalSupply();
