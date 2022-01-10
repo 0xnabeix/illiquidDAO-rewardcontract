@@ -180,7 +180,7 @@ interface IMasterChefV2 {
 }
 
 /// @author @0xKeno
-contract SOSRewarder is IRewarder,  BoringOwnable{
+contract illiquidRewarder is IRewarder,  BoringOwnable{
     using BoringMath for uint256;
     using BoringMath128 for uint128;
     using BoringERC20 for IERC20;
