@@ -28,20 +28,20 @@ contract IlliquidDAOStaking is ERC20("veIlliquidDAO", "veIlliquidDAO"), Ownable 
     /*
      * Construct an OpenDAOStaking contract.
      *
-     * @param _sos the contract address of SOS token
+     * @param _illiquidDAOAmount the contract address of IlliquidDAOAmount token
      * @param _periodStart the initial start time of rewards period
      * @param _rewardsDuration the duration of rewards in seconds
      */
     constructor(IERC20 _illiquidDAO, uint64 _periodStart, uint64 _rewardsDuration) {
-        require(address(_illiquidDAO) != address(0), "OpenDAOStaking: _sos cannot be the zero address");
+        require(address(_illiquidDAO) != address(0), "OpenDAOStaking: _illiquidDAOAmount cannot be the zero address");
         illiquidDAO = _illiquidDAO;
         setPeriod(_periodStart, _rewardsDuration);
     }
 
     /*
-     * Add SOS tokens to the reward pool.
+     * Add IlliquidDAOAmount tokens to the reward pool.
      *
-     * @param _sosAmount the amount of SOS tokens to add to the reward pool
+     * @param _illiquidDAOAmountAmount the amount of IlliquidDAOAmount tokens to add to the reward pool
      */
     function addRewardIlliquidDAO(uint256 _illiquidDAOAmount) external {
         Config memory cfg = config;
@@ -73,9 +73,9 @@ contract IlliquidDAOStaking is ERC20("veIlliquidDAO", "veIlliquidDAO"), Ownable 
     }
 
     /*
-     * Returns the staked sos + release rewards
+     * Returns the staked illiquidDAOAmount + release rewards
      *
-     * @returns amount of available sos
+     * @returns amount of available illiquidDAOAmount
      */
     function getIlliquidDAOPool() public view returns(uint256) {
         return illiquidDAO.balanceOf(address(this)) - frozenRewards();
@@ -105,10 +105,10 @@ contract IlliquidDAOStaking is ERC20("veIlliquidDAO", "veIlliquidDAO"), Ownable 
     }
 
     /*
-     * Staking specific amount of SOS token and get corresponding amount of veSOS
+     * Staking specific amount of IlliquidDAOAmount token and get corresponding amount of veIlliquidDAOAmount
      * as the user's share in the pool
      *
-     * @param _sosAmount
+     * @param _illiquidDAOAmountAmount
      */
     function enter(uint256 _illiquidDAOAmount) external {
         require(_illiquidDAOAmount > 0, "OpenDAOStaking: Should at least stake something");
@@ -116,7 +116,7 @@ contract IlliquidDAOStaking is ERC20("veIlliquidDAO", "veIlliquidDAO"), Ownable 
         uint256 totalIlliquidDAO = getIlliquidDAOPool();
         uint256 totalShares = totalSupply();
 
-        sos.safeTransferFrom(msg.sender, address(this), _illiquidDAOAmount);
+        illiquidDAOAmount.safeTransferFrom(msg.sender, address(this), _illiquidDAOAmount);
 
         if (totalShares == 0 || totalIlliquidDAO == 0) {
             _mint(msg.sender, _illiquidDAOAmount);
@@ -127,8 +127,8 @@ contract IlliquidDAOStaking is ERC20("veIlliquidDAO", "veIlliquidDAO"), Ownable 
     }
 
     /*
-     * Redeem specific amount of veSOS to SOS tokens according to the user's share in the pool.
-     * veSOS will be burnt.
+     * Redeem specific amount of veIlliquidDAOAmount to IlliquidDAOAmount tokens according to the user's share in the pool.
+     * veIlliquidDAOAmount will be burnt.
      *
      * @param _share
      */
