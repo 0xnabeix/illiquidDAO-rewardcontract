@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract illiquidDAOStaking is ERC20("veSOS", "veSOS"), Ownable {
+contract IlliquidDAOStaking is ERC20("veIlliquidDAO", "veIlliquidDAO"), Ownable {
     using SafeERC20 for IERC20;
     using SafeCast for int256;
     using SafeCast for uint256;
@@ -22,7 +22,7 @@ contract illiquidDAOStaking is ERC20("veSOS", "veSOS"), Ownable {
         uint128 totalReward;
     }
 
-    IERC20 public sos;
+    IERC20 public illiquidDAO;
     Config public config;
 
     /*
@@ -32,9 +32,9 @@ contract illiquidDAOStaking is ERC20("veSOS", "veSOS"), Ownable {
      * @param _periodStart the initial start time of rewards period
      * @param _rewardsDuration the duration of rewards in seconds
      */
-    constructor(IERC20 _sos, uint64 _periodStart, uint64 _rewardsDuration) {
-        require(address(_sos) != address(0), "OpenDAOStaking: _sos cannot be the zero address");
-        sos = _sos;
+    constructor(IERC20 _illiquidDAO, uint64 _periodStart, uint64 _rewardsDuration) {
+        require(address(_illiquidDAO) != address(0), "OpenDAOStaking: _sos cannot be the zero address");
+        illiquidDAO = _illiquidDAO;
         setPeriod(_periodStart, _rewardsDuration);
     }
 
@@ -43,12 +43,12 @@ contract illiquidDAOStaking is ERC20("veSOS", "veSOS"), Ownable {
      *
      * @param _sosAmount the amount of SOS tokens to add to the reward pool
      */
-    function addRewardSOS(uint256 _sosAmount) external {
+    function addRewardIlliquidDAO(uint256 _illiquidDAOAmount) external {
         Config memory cfg = config;
         require(block.timestamp < cfg.periodFinish, "OpenDAOStaking: Adding rewards is forbidden");
 
-        sos.safeTransferFrom(msg.sender, address(this), _sosAmount);
-        cfg.totalReward += _sosAmount.toUint128();
+        illiquidDAO.safeTransferFrom(msg.sender, address(this), _illiquidDAOAmount);
+        cfg.totalReward += _illiquidDAOAmount.toUint128();
         config = cfg;
     }
 
@@ -77,8 +77,8 @@ contract illiquidDAOStaking is ERC20("veSOS", "veSOS"), Ownable {
      *
      * @returns amount of available sos
      */
-    function getSOSPool() public view returns(uint256) {
-        return sos.balanceOf(address(this)) - frozenRewards();
+    function getIlliquidDAOPool() public view returns(uint256) {
+        return illiquidDAO.balanceOf(address(this)) - frozenRewards();
     }
 
     /*
@@ -110,18 +110,18 @@ contract illiquidDAOStaking is ERC20("veSOS", "veSOS"), Ownable {
      *
      * @param _sosAmount
      */
-    function enter(uint256 _sosAmount) external {
-        require(_sosAmount > 0, "OpenDAOStaking: Should at least stake something");
+    function enter(uint256 _illiquidDAOAmount) external {
+        require(_illiquidDAOAmount > 0, "OpenDAOStaking: Should at least stake something");
 
-        uint256 totalSOS = getSOSPool();
+        uint256 totalIlliquidDAO = getIlliquidDAOPool();
         uint256 totalShares = totalSupply();
 
-        sos.safeTransferFrom(msg.sender, address(this), _sosAmount);
+        sos.safeTransferFrom(msg.sender, address(this), _illiquidDAOAmount);
 
-        if (totalShares == 0 || totalSOS == 0) {
-            _mint(msg.sender, _sosAmount);
+        if (totalShares == 0 || totalIlliquidDAO == 0) {
+            _mint(msg.sender, _illiquidDAOAmount);
         } else {
-            uint256 _share = _sosAmount * totalShares / totalSOS;
+            uint256 _share = _illiquidDAOAmount * totalShares / totalIlliquidDAO;
             _mint(msg.sender, _share);
         }
     }
@@ -135,12 +135,12 @@ contract illiquidDAOStaking is ERC20("veSOS", "veSOS"), Ownable {
     function leave(uint256 _share) external {
         require(_share > 0, "OpenDAOStaking: Should at least unstake something");
 
-        uint256 totalSOS = getSOSPool();
+        uint256 totalIlliquidDAO = getIlliquidDAOPool();
         uint256 totalShares = totalSupply();
 
         _burn(msg.sender, _share);
 
-        uint256 _sosAmount = _share * totalSOS / totalShares;
-        sos.safeTransfer(msg.sender, _sosAmount);
+        uint256 _illiquidDAOAmount = _share * totalIlliquidDAO / totalShares;
+        illiquidDAO.safeTransfer(msg.sender, _illiquidDAOAmount);
     }
 }
