@@ -116,7 +116,7 @@ contract IlliquidDAOStaking is ERC20("veIlliquidDAO", "veIlliquidDAO"), Ownable 
         uint256 totalIlliquidDAO = getIlliquidDAOPool();
         uint256 totalShares = totalSupply();
 
-        illiquidDAOAmount.safeTransferFrom(msg.sender, address(this), _illiquidDAOAmount);
+        illiquidDAO.safeTransferFrom(msg.sender, address(this), _illiquidDAOAmount);
 
         if (totalShares == 0 || totalIlliquidDAO == 0) {
             _mint(msg.sender, _illiquidDAOAmount);
